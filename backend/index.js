@@ -8,6 +8,8 @@ const app = express();
 dotenv.config();
 connectionDb();
 
+
+
 app.use(cors());
 app.use(express.json());
 app.use("/api/auth",userRouter);
@@ -17,3 +19,6 @@ app.use("/ai",aiRouter);
  app.listen(PORT,()=>{
   console.log(`Server is listening in PORT ${PORT}`);
  })
+
+ //Write a function to find the longest common prefix string amongst an array of strings.
+ //If there is no common prefix, return an  empty string "";
