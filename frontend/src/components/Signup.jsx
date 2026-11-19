@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api, { errorMessage } from "../api";
 import AuthLayout from "./AuthLayout";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUser, FaEnvelope, FaLock, FaUserPlus } from "react-icons/fa";
@@ -16,17 +16,13 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:2000/api/auth/signup",
-        { Name, Email, Password }
-      );
+      const response = await api.post("/auth/signup", { Name, Email, Password });
       if (response.data.success) {
         toast.success("Signup successfully!");
         navigate("/login");
       }
     } catch (error) {
-      console.log(error);
-      toast.error("Signup failed!");
+      toast.error(errorMessage(error, "Signup failed!"));
     }
   };
 
@@ -69,6 +65,8 @@ const Signup = () => {
         <FaLock className="text-gray-500 mr-2" />
         <input
           type="password"
+          minLength={8}
+          maxLength={72}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
           className="w-full bg-transparent outline-none text-base sm:text-lg text-black dark:text-white"

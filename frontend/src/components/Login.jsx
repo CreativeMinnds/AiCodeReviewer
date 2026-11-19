@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import AuthLayout from "./AuthLayout";
-import axios from "axios";
+import api, { errorMessage } from "../api";
 import { Link, useNavigate } from "react-router-dom";
 import { FaSignInAlt, FaEnvelope, FaLock } from "react-icons/fa";
 import { toast } from "react-toastify";
@@ -14,18 +14,13 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:2000/api/auth/login",
-        { Email, Password }
-      );
+      const response = await api.post("/auth/login", { Email, Password });
       if (response.data.success) {
         toast.success("Login successfully!");
-        localStorage.setItem("token", response.data.token);
         navigate("/home");
       }
     } catch (error) {
-      console.log(error);
-      toast.error("Login failed!");
+      toast.error(errorMessage(error, "Login failed!"));
     }
   };
 

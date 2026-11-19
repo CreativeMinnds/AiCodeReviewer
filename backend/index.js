@@ -1,24 +1,45 @@
+const config = require("./config/env"); // loads .env and validates it first
 const express = require("express");
-const  connectionDb  = require("./db");
+const helmet = require("helmet");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const connectionDb = require("./db");
 const userRouter = require("./routes/userRoute");
 const aiRouter = require("./routes/aiRoutes");
-const dotenv = require("dotenv");
-const cors = require("cors");
+const { globalLimiter } = require("./middleware/rateLimit");
+const { notFound, errorHandler } = require("./middleware/errorHandler");
+
 const app = express();
-dotenv.config();
+
+// Needed so rate limiting sees the real client IP behind Render's proxy.
+app.set("trust proxy", config.trustProxyHops);
+app.disable("x-powered-by");
+
+app.use(helmet());
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // No Origin header = same-origin request, curl, or health checks.
+      if (!origin || config.clientOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  })
+);
+app.use(globalLimiter);
+app.use(express.json({ limit: "100kb" }));
+app.use(cookieParser());
+
+app.get("/health", (req, res) => res.status(200).json({ status: "ok" }));
+
+app.use("/api/auth", userRouter);
+app.use("/api/ai", aiRouter);
+
+app.use(notFound);
+app.use(errorHandler);
+
 connectionDb();
 
-
-
-app.use(cors());
-app.use(express.json());
-app.use("/api/auth",userRouter);
-app.use("/ai",aiRouter);
-
- const PORT = 2000; 
- app.listen(PORT,()=>{
-  console.log(`Server is listening in PORT ${PORT}`);
- })
-
- //Write a function to find the longest common prefix string amongst an array of strings.
- //If there is no common prefix, return an  empty string "";
+app.listen(config.port, () => {
+  console.log(`Server is listening on PORT ${config.port}`);
+});

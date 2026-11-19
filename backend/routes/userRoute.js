@@ -1,9 +1,17 @@
 const express = require("express");
-const { signup, login } = require("../controller/userController");
+const { signup, login, me, logout } = require("../controller/userController");
+const requireAuth = require("../middleware/auth");
+const validate = require("../middleware/validate");
+const { authLimiter, loginLimiter } = require("../middleware/rateLimit");
+const { signupSchema, loginSchema } = require("../validators");
 
 const router = express.Router();
 
-router.post("/signup",signup);
-router.post("/login",login);
+router.use(authLimiter);
 
-module.exports = router; 
+router.post("/signup", validate(signupSchema), signup);
+router.post("/login", validate(loginSchema), loginLimiter, login);
+router.get("/me", requireAuth, me);
+router.post("/logout", logout);
+
+module.exports = router;

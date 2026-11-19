@@ -12,6 +12,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.10",
     "axios": "^1.10.0",
+    "highlight.js": "^11.12.0",
     "lucide-react": "^0.540.0",
     "prismjs": "^1.30.0",
     "react": "^19.1.0",
@@ -22,6 +23,7 @@
     "react-simple-code-editor": "^0.14.1",
     "react-toastify": "^11.0.5",
     "rehype-highlight": "^7.0.2",
+    "remark-gfm": "^4.0.1",
     "tailwindcss": "^4.1.10"
   },
   "devDependencies": {

@@ -1,40 +1,22 @@
- const aiService = require("../services/ai.service");
+const aiService = require("../services/ai.service");
+
 const getReview = async (req, res) => {
-  console.log("Request body:", req.body); // For debugging
-
-  const prompt = req.body.prompt;
-  if (!prompt || typeof prompt !== "string" || prompt.trim() === "") {
-    return res.status(400).send("Prompt is required");
-  }
-
   try {
-    const response = await aiService(prompt.trim()); 
-    res.status(200).json({ success:true, message: response });
+    // req.body.prompt is already trimmed and length-checked by the validator.
+    const review = await aiService(req.body.prompt);
+    return res.status(200).json({ success: true, message: review });
   } catch (error) {
-    console.error("Error in AI response:", error.message);
+    // Log the reason server-side only; never log the user's code.
+    console.error("AI review failed:", error.status || "", error.message);
+
     if (error.status === 429) {
-      return res.status(429).json({ success: false, message: "AI rate limit reached. Please try again shortly." });
+      return res.status(503).json({ success: false, message: "The AI service is busy. Please try again shortly." });
     }
-    res.status(500).json({ success: false, message: "AI request failed" });
+    if (error.name === "APIConnectionTimeoutError") {
+      return res.status(504).json({ success: false, message: "The review took too long. Try a shorter snippet." });
+    }
+    return res.status(502).json({ success: false, message: "The AI review failed. Please try again." });
   }
 };
 
-
-
- module.exports = getReview
-
-
-
-// const getResponse = async (req, res) => {
-//   try {
-//     const prompt = req.query.prompt || "Hello, AI!";
-//     const aiResponse = await aiService(prompt);
-//     res.status(200).json({ success: true, message: aiResponse });
-//   } catch (error) {
-//     console.error("Error in AI response:", error.message);
-//     res.status(500).json({ success: false, message: "AI request failed" });
-//   }
-// };
-
-
-// module.exports=getResponse;
+module.exports = getReview;
