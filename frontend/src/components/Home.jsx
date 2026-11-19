@@ -110,10 +110,8 @@ const Home = () => {
           color: "#ffffff",
           overflowY: "auto",
           overflowX: "hidden",
-          maxHeight: "90vh",
           border: "1px solid #444",
           borderRadius: "5px",
-          marginLeft: "1rem",
           width: "100%",
           wordBreak: "normal",
           overflowWrap: "break-word",
@@ -124,16 +122,12 @@ const Home = () => {
         <button
           type="button"
           onClick={logout}
+          className="logout"
           style={{
             position: "absolute",
-            top: "0.5rem",
-            right: "0.75rem",
-            background: "transparent",
-            border: "1px solid #555",
-            color: "#ccc",
-            borderRadius: "0.4rem",
-            padding: "0.15rem 0.6rem",
-            fontSize: "0.8rem",
+            top: "0.75rem",
+            right: "1rem",
+            border: "none",
             cursor: "pointer",
           }}
         >
@@ -141,7 +135,7 @@ const Home = () => {
         </button>
         {error && <p style={{ color: "#f87171" }}>{error}</p>}
         {!error && !review && !loading && (
-          <p style={{ color: "#9ca3af" }}>
+          <p style={{ color: "#9ca3af", marginTop: "3rem" }}>
             Your review will appear here. Paste code and click Review.
           </p>
         )}
