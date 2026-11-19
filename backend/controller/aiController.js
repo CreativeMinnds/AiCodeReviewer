@@ -12,6 +12,9 @@ const getReview = async (req, res) => {
     res.status(200).json({ success:true, message: response });
   } catch (error) {
     console.error("Error in AI response:", error.message);
+    if (error.status === 429) {
+      return res.status(429).json({ success: false, message: "AI rate limit reached. Please try again shortly." });
+    }
     res.status(500).json({ success: false, message: "AI request failed" });
   }
 };
