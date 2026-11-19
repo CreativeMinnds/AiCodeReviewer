@@ -6,7 +6,7 @@ An intelligent web application built with the MERN stack that provides **automat
 
 ## 🚀 Features
 
-- 🧠 **AI-Powered Code Review** using Gemini Pro 1.5
+- 🧠 **AI-Powered Code Review** using  openai/gpt-oss-120b 
 - 🖥️ **Live Code Editor** with syntax highlighting
 - ✅ **Signup & Login** with secure password hashing (bcrypt)
 - 🔐 **JWT Authentication**
