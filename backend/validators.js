@@ -1,6 +1,9 @@
 const { z } = require("zod");
 const config = require("./config/env");
 
+const LANGUAGES = ["auto", "javascript", "typescript", "python", "java", "c", "cpp", "csharp", "go", "sql"];
+const MODES = ["full", "security", "beginner", "cleanup"];
+
 const email = z
   .string({ error: "Email is required" })
   .trim()
@@ -29,6 +32,8 @@ const reviewSchema = z.object({
     .trim()
     .min(1, "Please enter some code to review")
     .max(config.maxCodeChars, `Code is too long (max ${config.maxCodeChars} characters)`),
+  language: z.enum(LANGUAGES, { error: "Unsupported language" }).optional().default("auto"),
+  mode: z.enum(MODES, { error: "Unsupported review mode" }).optional().default("full"),
 });
 
-module.exports = { signupSchema, loginSchema, reviewSchema };
+module.exports = { signupSchema, loginSchema, reviewSchema, LANGUAGES, MODES };

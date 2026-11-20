@@ -1,43 +1,75 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "prismjs/themes/prism-tomorrow.css";
 import Editor from "react-simple-code-editor";
 import prism from "prismjs";
-import Markdown from "react-markdown";
-import "prismjs/components/prism-javascript";
-import rehypeHighlight from "rehype-highlight";
-import remarkGfm from "remark-gfm";
-import "highlight.js/styles/github-dark.css";
+// Core Prism already includes JavaScript; these add the other editor languages.
+import "prismjs/components/prism-typescript";
+import "prismjs/components/prism-python";
+import "prismjs/components/prism-java";
+import "prismjs/components/prism-c";
+import "prismjs/components/prism-cpp";
+import "prismjs/components/prism-csharp";
+import "prismjs/components/prism-go";
+import "prismjs/components/prism-sql";
 import api, { errorMessage } from "../api";
+import ReviewPanel from "./ReviewPanel";
 import "./Home.css";
 
 const MAX_CODE_CHARS = 10000; // keep in sync with the backend limit
+
+// value must match the backend's allowed languages; "auto" lets the AI detect it.
+const LANGUAGES = [
+  { value: "auto", label: "Auto-detect", grammar: "javascript" },
+  { value: "javascript", label: "JavaScript", grammar: "javascript" },
+  { value: "typescript", label: "TypeScript", grammar: "typescript" },
+  { value: "python", label: "Python", grammar: "python" },
+  { value: "java", label: "Java", grammar: "java" },
+  { value: "c", label: "C", grammar: "c" },
+  { value: "cpp", label: "C++", grammar: "cpp" },
+  { value: "csharp", label: "C#", grammar: "csharp" },
+  { value: "go", label: "Go", grammar: "go" },
+  { value: "sql", label: "SQL", grammar: "sql" },
+];
+
+const MODES = [
+  { value: "full", label: "Full review" },
+  { value: "security", label: "Security focus" },
+  { value: "beginner", label: "Beginner-friendly" },
+  { value: "cleanup", label: "Quick cleanup" },
+];
 
 const Home = () => {
   const navigate = useNavigate();
   const [code, setCode] = useState(`function sum() {
   return 1 + 1;
 }`);
-  const [review, setReview] = useState("");
+  const [language, setLanguage] = useState("auto");
+  const [mode, setMode] = useState("full");
+  const [review, setReview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    prism.highlightAll();
-  }, []);
+  const grammarName = LANGUAGES.find((l) => l.value === language)?.grammar || "javascript";
+
+  function highlight(value) {
+    const grammar = prism.languages[grammarName] || prism.languages.javascript;
+    return prism.highlight(value, grammar, grammarName);
+  }
 
   async function reviewCode() {
     if (loading || !code.trim()) return;
     setLoading(true);
     setError("");
     try {
-      const response = await api.post("/ai/get-review", { prompt: code });
-      setReview(response.data.message);
+      const response = await api.post("/ai/get-review", { prompt: code, language, mode });
+      setReview(response.data.review);
     } catch (err) {
       if (err.response?.status === 401) {
         navigate("/login"); // session expired
         return;
       }
+      setReview(null);
       setError(errorMessage(err, "Something went wrong during review."));
     } finally {
       setLoading(false);
@@ -53,6 +85,7 @@ const Home = () => {
   }
 
   const tooLong = code.length > MAX_CODE_CHARS;
+  const disabled = loading || tooLong || !code.trim();
 
   return (
     <main>
@@ -61,9 +94,7 @@ const Home = () => {
           <Editor
             value={code}
             onValueChange={(value) => setCode(value)}
-            highlight={(value) =>
-              prism.highlight(value, prism.languages.javascript, "javascript")
-            }
+            highlight={highlight}
             padding={10}
             style={{
               fontFamily: "monospace",
@@ -90,11 +121,11 @@ const Home = () => {
         <button
           type="button"
           onClick={reviewCode}
-          disabled={loading || tooLong || !code.trim()}
+          disabled={disabled}
           className="review"
           style={{
             border: "none",
-            opacity: loading || tooLong || !code.trim() ? 0.6 : 1,
+            opacity: disabled ? 0.6 : 1,
             cursor: loading ? "wait" : "pointer",
           }}
         >
@@ -110,8 +141,10 @@ const Home = () => {
           color: "#ffffff",
           overflowY: "auto",
           overflowX: "hidden",
+          maxHeight: "90vh",
           border: "1px solid #444",
           borderRadius: "5px",
+          marginLeft: "1rem",
           width: "100%",
           wordBreak: "normal",
           overflowWrap: "break-word",
@@ -119,42 +152,33 @@ const Home = () => {
           position: "relative",
         }}
       >
-        <button
-          type="button"
-          onClick={logout}
-          className="logout"
-          style={{
-            position: "absolute",
-            top: "0.75rem",
-            right: "1rem",
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          Logout
-        </button>
-        {error && <p style={{ color: "#f87171" }}>{error}</p>}
-        {!error && !review && !loading && (
-          <p style={{ color: "#9ca3af", marginTop: "3rem" }}>
-            Your review will appear here. Paste code and click Review.
-          </p>
-        )}
-        {loading && <p style={{ color: "#9ca3af" }}>Reviewing your code...</p>}
-        {!loading && !error && review && (
-          <Markdown
-            remarkPlugins={[remarkGfm]}
-            rehypePlugins={[rehypeHighlight]}
-            components={{
-              table: (props) => (
-                <div style={{ overflowX: "auto" }}>
-                  <table {...props} />
-                </div>
-              ),
-            }}
-          >
-            {review}
-          </Markdown>
-        )}
+        <div className="rp-toolbar">
+          <label>
+            Language
+            <select value={language} onChange={(e) => setLanguage(e.target.value)} disabled={loading}>
+              {LANGUAGES.map((l) => (
+                <option key={l.value} value={l.value}>
+                  {l.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Mode
+            <select value={mode} onChange={(e) => setMode(e.target.value)} disabled={loading}>
+              {MODES.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button type="button" className="rp-logout" onClick={logout}>
+            Logout
+          </button>
+        </div>
+
+        <ReviewPanel review={review} loading={loading} error={error} onUseCode={setCode} />
       </div>
     </main>
   );

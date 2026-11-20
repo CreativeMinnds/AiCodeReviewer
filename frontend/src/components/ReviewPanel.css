@@ -1,0 +1,194 @@
+/* Styles for the review panel. Everything is scoped under .right, so it cannot leak elsewhere. */
+
+.rp-toolbar {
+  position: sticky;
+  top: -1rem;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin: -1rem -1rem 1rem;
+  padding: 0.6rem 1rem;
+  background: #1e1e1e;
+  border-bottom: 1px solid #333;
+}
+.rp-toolbar label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+.rp-toolbar select {
+  background: #2a2a2a;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 0.4rem;
+  padding: 0.2rem 0.4rem;
+  font-size: 0.85rem;
+}
+.rp-logout {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid #555;
+  color: #ccc;
+  border-radius: 0.4rem;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.rp-logout:hover { background: #2a2a2a; }
+
+.rp-muted { color: #9ca3af; }
+.rp-empty { padding: 1rem 0; }
+.rp-error {
+  color: #fca5a5;
+  background: #3b1d1d;
+  border: 1px solid #7f1d1d;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+}
+
+/* loading skeleton */
+.rp-skeleton {
+  height: 0.9rem;
+  margin: 0.7rem 0;
+  border-radius: 0.3rem;
+  background: linear-gradient(90deg, #2a2a2a, #3a3a3a, #2a2a2a);
+  background-size: 200% 100%;
+  animation: rp-pulse 1.4s ease-in-out infinite;
+}
+.rp-skeleton-title { width: 40%; height: 1.3rem; }
+.rp-skeleton-short { width: 60%; }
+@keyframes rp-pulse {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rp-skeleton { animation: none; }
+}
+
+/* header with score */
+.rp-header { display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 1rem; }
+.rp-header-text { flex: 1; min-width: 0; }
+.rp-title { margin: 0 0 0.4rem; font-size: 1.25rem; font-weight: 700; display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.rp-summary { margin: 0; line-height: 1.5; color: #e5e7eb; }
+.rp-score {
+  flex: none;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  width: 4.2rem;
+  height: 4.2rem;
+  padding-top: 1rem;
+  border-radius: 50%;
+  border: 4px solid;
+  background: #262626;
+}
+.rp-score.good { border-color: #34d399; color: #34d399; }
+.rp-score.ok { border-color: #fbbf24; color: #fbbf24; }
+.rp-score.bad { border-color: #f87171; color: #f87171; }
+.rp-score-number { font-size: 1.6rem; font-weight: 700; line-height: 1; }
+.rp-score-max { font-size: 0.7rem; opacity: 0.8; }
+
+.rp-chip {
+  display: inline-block;
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
+  background: #333;
+  color: #d1d5db;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+.rp-line { background: #1e3a5f; color: #bfdbfe; }
+
+/* filters */
+.rp-filters { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.8rem; }
+.rp-filter {
+  background: #2a2a2a;
+  color: #d1d5db;
+  border: 1px solid #444;
+  border-radius: 999px;
+  padding: 0.2rem 0.75rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.rp-filter:disabled { opacity: 0.4; cursor: default; }
+.rp-filter.active { background: #fff; color: #111; border-color: #fff; }
+.rp-filter.critical.active { background: #f87171; border-color: #f87171; }
+.rp-filter.warning.active { background: #fbbf24; border-color: #fbbf24; }
+.rp-filter.suggestion.active { background: #60a5fa; border-color: #60a5fa; }
+
+/* issue cards */
+.rp-issues { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.7rem; }
+.rp-issue {
+  background: #262626;
+  border: 1px solid #383838;
+  border-left: 4px solid #60a5fa;
+  border-radius: 0.5rem;
+  padding: 0.75rem 0.9rem;
+}
+.rp-issue.critical { border-left-color: #f87171; }
+.rp-issue.warning { border-left-color: #fbbf24; }
+.rp-issue.suggestion { border-left-color: #60a5fa; }
+.rp-issue-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
+.rp-issue-title { font-size: 0.98rem; }
+.rp-fix {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.7rem;
+  background: #1b2a22;
+  border: 1px solid #24503a;
+  border-radius: 0.4rem;
+}
+.rp-fix-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #6ee7b7; }
+
+/* rendered markdown inside cards (the global reset removes default spacing) */
+.rp-md p { margin: 0.3rem 0; line-height: 1.5; }
+.rp-md ul { list-style: disc; padding-left: 1.3rem; margin: 0.3rem 0; }
+.rp-md ol { list-style: decimal; padding-left: 1.3rem; margin: 0.3rem 0; }
+.rp-md h1, .rp-md h2, .rp-md h3, .rp-md h4 { font-weight: 700; margin: 0.8rem 0 0.3rem; }
+.rp-md code, .rp-positives code {
+  background: #333;
+  border-radius: 0.25rem;
+  padding: 0.05rem 0.3rem;
+  font-size: 0.88em;
+}
+.rp-md pre { background: #111; border-radius: 0.4rem; padding: 0.6rem; overflow-x: auto; }
+.rp-md pre code { background: none; padding: 0; }
+
+/* sections */
+.rp-card {
+  margin-top: 1rem;
+  padding: 0.75rem 0.9rem;
+  background: #262626;
+  border: 1px solid #383838;
+  border-radius: 0.5rem;
+}
+.rp-section-title { margin: 0 0 0.4rem; font-size: 1rem; font-weight: 700; cursor: default; }
+.rp-positives { list-style: disc; padding-left: 1.3rem; margin: 0; }
+.rp-positives li { margin: 0.2rem 0; }
+.rp-clean { margin: 0.5rem 0; color: #6ee7b7; }
+
+.rp-improved summary { cursor: pointer; }
+.rp-actions { display: flex; gap: 0.5rem; margin: 0.5rem 0; }
+.rp-btn {
+  background: #333;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 0.4rem;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.rp-btn:hover { background: #444; }
+.rp-code {
+  margin: 0;
+  padding: 0.7rem;
+  background: #111;
+  border-radius: 0.4rem;
+  overflow-x: auto;
+  white-space: pre;
+  font-size: 0.9rem;
+}
+.rp-code code { font-family: monospace; }

@@ -2,9 +2,10 @@ const aiService = require("../services/ai.service");
 
 const getReview = async (req, res) => {
   try {
-    // req.body.prompt is already trimmed and length-checked by the validator.
-    const review = await aiService(req.body.prompt);
-    return res.status(200).json({ success: true, message: review });
+    // req.body is already cleaned and length-checked by the validator.
+    const { prompt, language, mode } = req.body;
+    const review = await aiService(prompt, { language, mode });
+    return res.status(200).json({ success: true, review });
   } catch (error) {
     // Log the reason server-side only; never log the user's code.
     console.error("AI review failed:", error.status || "", error.message);
