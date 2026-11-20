@@ -133,25 +133,7 @@ const Home = () => {
         </button>
       </div>
 
-      <div
-        className="right"
-        style={{
-          padding: "1rem",
-          backgroundColor: "#1e1e1e",
-          color: "#ffffff",
-          overflowY: "auto",
-          overflowX: "hidden",
-          maxHeight: "90vh",
-          border: "1px solid #444",
-          borderRadius: "5px",
-          marginLeft: "1rem",
-          width: "100%",
-          wordBreak: "normal",
-          overflowWrap: "break-word",
-          whiteSpace: "normal",
-          position: "relative",
-        }}
-      >
+      <div className="right">
         <div className="rp-toolbar">
           <label>
             Language
